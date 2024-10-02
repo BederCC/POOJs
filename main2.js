@@ -1,4 +1,27 @@
 //abstraccion y encapsulamiento
+//herencia y polimorfismo
+
+class Comment {
+    constructor({
+        content,
+        studentName,
+        studentRole = "estudiante",
+    }) {
+        this.content = content;
+        this.studentName = studentName;
+        this.studentRole = studentRole;
+        this.likes = 0;
+    }
+
+    publicar() {
+        console.log(this.studentName + "(" + this.studentRole + ")");
+        console.log(this.likes + " likes");
+        console.log(this.content);
+    }
+
+    
+}
+
 
 function videoPlay(id) {
     const urlSecreta = "https://platziultrasecreto.com/" + id;
@@ -10,7 +33,7 @@ function videoStop(id) {
     console.log("Pausamos la url " + urlSecreta);
 }
 
-export class PlatziClass {
+class PlatziClass {
     constructor({
         name,
         videoID,
@@ -30,9 +53,16 @@ export class PlatziClass {
 
 
 class Course {
-    constructor({ name, classes = [] }) {
+    constructor({ 
+        name, 
+        classes = [],
+        isFree = false,
+        lang = "spanish",
+    }) {
         this._name = name;
         this.classes = classes;
+        this.isFree = isFree;
+        this.lang = lang;
     }
 
     get name() {
@@ -52,6 +82,7 @@ class Course {
 
 const cursoProgBasica = new Course({
     name: "Curso Gratis de Programación Básica",
+    isFree: true,
 });
 
 cursoProgBasica.name = "Curso de Programación Básica"; // Web... no
@@ -63,6 +94,7 @@ const cursoDefinitivoHTML = new Course({
 
 const cursoPracticoHTML = new Course({
     name: "Curso Práctico de HTML y CSS",
+    lang: "english",
 });
 
 class LearningPath {
@@ -98,6 +130,9 @@ const escuelaVgs = new LearningPath({
     ],
 });
 
+
+
+
 class Student {
     constructor({
         name,
@@ -120,9 +155,74 @@ class Student {
         this.approvedCourses = approvedCourses;
         this.learningPaths = learningPaths;
     }
+
+    publicasComentario(commentContent) {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+        });
+        comment.publicar();
+    }
 }
 
-const juan2 = new Student({
+class FreeStudent extends Student {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        if (newCourse.isFree()) {
+            this.approvedCourses.push(newCourse);
+        } else {
+            console.warn("Lo siento, " + this.name + ", solo puedes tomar cursos abiertos");
+        }
+    }
+}
+
+class BasicStudent extends Student {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        if (newCourse.lang !== "english") {
+            this.approvedCourses.push(newCourse);
+        } else {
+            console.warn("Lo siento, " + this.name + ", no puedes tomar este curso");
+        }
+    }
+}
+
+class ExpertStudent extends Student {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        this.approvedCourses.push(newCourse);
+    }
+}
+
+class TeacherStudent extends Student {
+    constructor(props) {
+        super(props);
+    }
+
+    approveCourse(newCourse) {
+        this.approvedCourses.push(newCourse);
+    }
+
+    publicasComentario(commentContent) {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+            studentRole: "profesor",
+        });
+        comment.publicar();
+    }
+}
+
+const juan = new FreeStudent({
     name: "JuanDC",
     username: "juandc",
     email: "juanito@juanito.com",
@@ -133,7 +233,7 @@ const juan2 = new Student({
     ],
 });
 
-const miguelito2 = new Student({
+const miguelito = new BasicStudent({
     name: "Miguelito",
     username: "miguelitofeliz",
     email: "migyel@miguel.com",
@@ -141,5 +241,17 @@ const miguelito2 = new Student({
     learningPaths: [
         escuelaData,
         escuelaWeb,
+    ],
+});
+
+const freddy = new TeacherStudent({
+    name: "Freddy Vega",
+    username: "freddier",
+    email: "f@gep.com",
+    instagram: "freddiervega",
+    learningPaths: [
+        escuelaWeb,
+        escuelaData,
+        escuelaVgs,
     ],
 });
